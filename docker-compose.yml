@@ -1,0 +1,24 @@
+services:
+  api:
+    build: .
+    ports: [ "8080:8080" ]
+    environment:
+      PORT: 8080
+      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_DATABASE: user_management
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRE_HOURS: 24
+    depends_on:
+      mongo:
+        condition: service_healthy
+  mongo:
+    image: mongo:7
+    ports: [ "27017:27017" ]
+    volumes: [ mongo_data:/data/db ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+volumes:
+  mongo_data:
